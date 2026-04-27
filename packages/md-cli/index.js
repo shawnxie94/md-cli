@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
+import { spawnSync } from 'node:child_process'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import getPort from 'get-port'
 import {
   colors,
@@ -8,7 +11,22 @@ import {
 } from './util.js'
 import { createServer } from './server.js'
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
+
+if (process.argv[2] === 'render') {
+  const renderScript = join(__dirname, 'bin/render.js')
+  if (!existsSync(renderScript)) {
+    console.error('md-cli render: missing bundled renderer. Run `npm run build:render` before using the local source checkout.')
+    process.exit(1)
+  }
+
+  const result = spawnSync(process.execPath, [renderScript, ...process.argv.slice(3)], {
+    stdio: 'inherit',
+  })
+  process.exit(result.status ?? 1)
+}
 
 const arg = parseArgv()
 

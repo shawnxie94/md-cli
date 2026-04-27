@@ -11,7 +11,7 @@ To get started with `md-cli`, you can install it either globally or locally, dep
 If you only need it for a specific project, you can install it locally by running:
 
 ```bash
-npm install @doocs/md-cli
+npm install @shawnxie666/md-cli
 ```
 
 ### Install globally
@@ -19,12 +19,54 @@ npm install @doocs/md-cli
 For global access across all your projects, install it globally with:
 
 ```bash
-npm install -g @doocs/md-cli
+npm install -g @shawnxie666/md-cli
 ```
 
 ## Usage
 
 Once installed, running `md-cli` is a breeze. Here’s how to get started:
+
+### Render Markdown for WeChat
+
+Render a Markdown file to WeChat Official Account-compatible HTML:
+
+```bash
+md-cli render input.md --output output.html
+```
+
+Print to stdout:
+
+```bash
+md-cli render input.md --stdout
+```
+
+The render command supports runtime style options:
+
+```bash
+md-cli render input.md --output output.html \
+  --theme grace \
+  --font-family sans \
+  --font-size recommended \
+  --primary-color classic-blue \
+  --heading-style default \
+  --code-theme idea \
+  --legend none \
+  --mac-code-block false \
+  --line-numbers false \
+  --cite false \
+  --indent false \
+  --justify true
+```
+
+Supported aliases:
+
+- `--theme`: `default`, `grace`, `simple`
+- `--font-family`: `sans`, `serif`, `mono`, or a CSS font-family value
+- `--font-size`: `recommended`, `14px`, `15px`, `16px`, `17px`, `18px`
+- `--primary-color`: `classic-blue`, Chinese color labels such as `经典蓝`, or a CSS color value
+- `--heading-style`: `default`, `color-only`, `border-bottom`, `border-left`
+- `--code-theme`: a highlight.js theme name such as `idea`, `github`, `xcode`, or a CSS URL
+- `--legend`: `none`, `alt`, `title`, `filename`, or a combined legend expression
 
 ### Default setup
 
@@ -41,10 +83,3 @@ If you prefer to run `md-cli` on a different port, say `8899`, just specify it l
 ```bash
 md-cli port=8899
 ```
-
-## Maintainers
-
-- [yanglbme](https://github.com/yanglbme) – Core maintainer.
-- [YangFong](https://github.com/yangfong) – Core maintainer.
-- [xw](https://github.com/wll8) – Contributor.
-- [thinkasany](https://www.npmjs.com/~thinkerwing) – Contributor.
