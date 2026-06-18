@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.repository == 'doocs/md'
+    if: github.repository == 'doocs/md' || github.repository == 'shawnxie94/md-cli'
     steps:
       - uses: actions/checkout@v6
 
