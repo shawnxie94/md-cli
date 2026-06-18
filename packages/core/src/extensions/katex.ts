@@ -1,7 +1,10 @@
 import type { MarkedExtension } from 'marked'
+import type { KatexRenderMode } from './katex-renderers'
+import { selectKatexRenderer } from './katex-renderers'
 
 export interface MarkedKatexOptions {
   nonStandard?: boolean
+  mode?: KatexRenderMode
 }
 
 const inlineRule = /^(\${1,2})(?!\$)((?:\\.|[^\\\n])*?(?:\\.|[^\\\n$]))\1(?=[\s?!.,:？！。，：]|$)/
@@ -13,36 +16,10 @@ const blockRule = /^\s{0,3}(\${1,2})[ \t]*\n([\s\S]+?)\n\s{0,3}\1[ \t]*(?:\n|$)/
 const inlineLatexRule = /^\\\(([^\\]*(?:\\.[^\\]*)*?)\\\)/
 const blockLatexRule = /^\\\[([^\\]*(?:\\.[^\\]*)*?)\\\]/
 
-function createRenderer(defaultDisplay: boolean, withStyle: boolean = true) {
-  return (token: any) => {
-    const display = token.displayMode ?? defaultDisplay
-
-    // @ts-expect-error MathJax is a global variable
-    window.MathJax.texReset()
-    // @ts-expect-error MathJax is a global variable
-    const mjxContainer = window.MathJax.tex2svg(token.text, { display })
-    const svg = mjxContainer.firstChild
-    const width = svg.style[`min-width`] || svg.getAttribute(`width`)
-    svg.removeAttribute(`width`)
-
-    // 行内公式对齐 https://groups.google.com/g/mathjax-users/c/zThKffrrCvE?pli=1
-    // 直接覆盖 style 会覆盖 MathJax 的样式，需要手动设置
-    // svg.style = `max-width: 300vw !important; display: initial; flex-shrink: 0;`
-
-    if (withStyle) {
-      svg.style.display = `initial`
-      svg.style.setProperty(`max-width`, `300vw`, `important`)
-      svg.style.flexShrink = `0`
-      svg.style.width = width
-    }
-
-    if (!display) {
-      // 新主题系统：使用 class 而非内联样式
-      return `<span class="katex-inline">${svg.outerHTML}</span>`
-    }
-
-    return `<section class="katex-block">${svg.outerHTML}</section>`
-  }
+function createRenderer(_defaultDisplay: boolean, withStyle: boolean, mode: KatexRenderMode) {
+  // _defaultDisplay 来自历史签名：mathjax 模式用 token.displayMode ?? _defaultDisplay。
+  // 现在两种渲染器都从 token.displayMode 拿值，这里忽略 _defaultDisplay 是安全的。
+  return selectKatexRenderer(mode, withStyle)
 }
 
 function inlineKatex(options: MarkedKatexOptions | undefined, renderer: any) {
@@ -153,12 +130,13 @@ function blockLatexKatex(_options: MarkedKatexOptions | undefined, renderer: any
 }
 
 export function MDKatex(options: MarkedKatexOptions | undefined, withStyle: boolean = true): MarkedExtension {
+  const mode: KatexRenderMode = options && options.mode === 'mathjax' ? 'mathjax' : 'passthrough'
   return {
     extensions: [
-      inlineKatex(options, createRenderer(false, withStyle)),
-      blockKatex(options, createRenderer(true, withStyle)),
-      inlineLatexKatex(options, createRenderer(false, withStyle)),
-      blockLatexKatex(options, createRenderer(true, withStyle)),
+      inlineKatex(options, createRenderer(false, withStyle, mode)),
+      blockKatex(options, createRenderer(true, withStyle, mode)),
+      inlineLatexKatex(options, createRenderer(false, withStyle, mode)),
+      blockLatexKatex(options, createRenderer(true, withStyle, mode)),
     ],
   }
 }

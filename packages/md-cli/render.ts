@@ -38,6 +38,7 @@ interface RenderOptions {
   justify: boolean
   customCSS?: string
   fullHtml: boolean
+  katexMode: 'mathjax' | 'passthrough'
 }
 
 const codeBlockUrlPrefix = 'https://cdn-doocs.oss-cn-shenzhen.aliyuncs.com/npm/highlightjs/11.11.1/styles/'
@@ -110,6 +111,7 @@ Options:
   --justify <true|false>
   --custom-css <path.css>          Extra CSS appended after theme CSS.
   --full-html                      Output a complete HTML document.
+  --katex <mathjax|passthrough>    KaTeX rendering mode. Default: passthrough (Node-friendly).
 
 The options also accept key=value form, for example:
   md-cli render input.md theme=grace font-family=sans justify=true
@@ -176,6 +178,7 @@ function parseArgs(argv: string[]): RenderOptions {
     justify: bool(values, true, 'justify'),
     customCSS: value(values, 'custom-css', 'customCSS'),
     fullHtml: bool(values, false, 'full-html', 'fullHtml'),
+    katexMode: oneOf(value(values, 'katex', 'katex-mode', 'katexMode') || 'passthrough', ['mathjax', 'passthrough'] as const, 'katex'),
   }
 }
 
@@ -428,6 +431,7 @@ async function main(): Promise<void> {
     citeStatus: options.cite,
     countStatus: options.count,
     legend: options.legend,
+    katexMode: options.katexMode,
   })
 
   renderer.reset({

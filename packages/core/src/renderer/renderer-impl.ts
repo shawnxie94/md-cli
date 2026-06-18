@@ -409,7 +409,6 @@ export function initRenderer(opts: IOpts = {}): RendererAPI {
   marked.use(markedToc())
   marked.use(markedSlider())
   marked.use(markedAlert({}))
-  marked.use(MDKatex({ nonStandard: true }, true))
   marked.use(markedFootnotes())
   marked.use(markedMermaid())
   marked.use(markedPlantUML({
@@ -417,6 +416,9 @@ export function initRenderer(opts: IOpts = {}): RendererAPI {
   }))
   marked.use(markedInfographic({ themeMode: opts.themeMode }))
   marked.use(markedRuby())
+  // katex 模式：默认 passthrough（Node 友好，不依赖 window.MathJax）。
+  // 浏览器侧可通过 IOpts.katexMode='mathjax' 切回 MathJax 渲染。
+  marked.use(MDKatex({ nonStandard: true, mode: opts.katexMode === 'mathjax' ? 'mathjax' : 'passthrough' }))
 
   return {
     buildAddition,

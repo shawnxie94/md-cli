@@ -12,6 +12,12 @@ export interface IOpts {
   isMacCodeBlock?: boolean
   isShowLineNumber?: boolean
   themeMode?: 'light' | 'dark'
+  /**
+   * KaTeX/MathJax 渲染模式：
+   * - 'mathjax'     : 原 doocs/md 行为，依赖 window.MathJax（仅浏览器可用）
+   * - 'passthrough' : 不渲染 LaTeX，把原始公式输出为 <code>，Node 友好（默认）
+   */
+  katexMode?: 'mathjax' | 'passthrough'
 }
 
 export interface IConfigOption<VT = string> {
